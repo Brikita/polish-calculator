@@ -5,6 +5,11 @@ exports.calculate = function (expression) {
   let currIndex = 0;
 
   const processToken = () => {
+    // check if the expression is complete
+    if (currIndex >= tokens.length) {
+      throw new Error("Incomplete expression: missing operand");
+    }
+
     const token = tokens[currIndex++];
     const num = parseFloat(token);
 
@@ -23,12 +28,21 @@ exports.calculate = function (expression) {
       case "*":
         return operand1 * operand2;
       case "/":
+        if (operand2 === 0) {
+          throw new Error("Division by zero");
+        }
         return operand1 / operand2;
-
       default:
-        return 0;
+        throw new Error(`Unknown operator: ${token}`);
     }
   };
 
-  return processToken();
+  const result = processToken();
+
+  // make sure all tokens were consumed
+  if (currIndex < tokens.length) {
+    throw new Error("Invalid expression: extra tokens after evaluation");
+  }
+
+  return result;
 };
